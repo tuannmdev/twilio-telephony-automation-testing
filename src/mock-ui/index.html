@@ -18,7 +18,7 @@
             sans: ["Plus Jakarta Sans", "sans-serif"],
           },
           borderRadius: {
-            "xlarge": "40px",
+            "xlarge": "32px",
           }
         },
       },
@@ -37,27 +37,27 @@
     }
     .neumorphic-flat {
       background: var(--bg-color);
-      box-shadow: 10px 10px 20px var(--shadow-dark),
-                  -10px -10px 20px var(--shadow-light);
+      box-shadow: 8px 8px 16px var(--shadow-dark),
+                  -8px -8px 16px var(--shadow-light);
     }
     .neumorphic-inset {
       background: var(--bg-color);
-      box-shadow: inset 6px 6px 12px var(--shadow-dark),
-                  inset -6px -6px 12px var(--shadow-light);
+      box-shadow: inset 4px 4px 8px var(--shadow-dark),
+                  inset -4px -4px 8px var(--shadow-light);
     }
     .neumorphic-button-forest {
       background: var(--forest-green);
-      box-shadow: 6px 6px 16px rgba(34, 197, 94, 0.25),
-                  -4px -4px 12px rgba(255, 255, 255, 0.4);
+      box-shadow: 4px 4px 12px rgba(34, 197, 94, 0.25),
+                  -3px -3px 10px rgba(255, 255, 255, 0.4);
     }
     .neumorphic-button-soft {
       background: var(--bg-color);
-      box-shadow: 6px 6px 12px var(--shadow-dark),
-                  -6px -6px 12px var(--shadow-light);
+      box-shadow: 4px 4px 8px var(--shadow-dark),
+                  -4px -4px 8px var(--shadow-light);
     }
     .neumorphic-button-soft:active {
-      box-shadow: inset 4px 4px 8px var(--shadow-dark),
-                  inset -4px -4px 8px var(--shadow-light);
+      box-shadow: inset 3px 3px 6px var(--shadow-dark),
+                  inset -3px -3px 6px var(--shadow-light);
     }
     .material-symbols-outlined {
       font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
@@ -101,106 +101,182 @@
     .status-indicator.failed .status-text {
       color: #ef4444;
     }
-    /* Button icon via pseudo-element to keep text content clean for tests */
     #make-call-btn::before {
       content: "phone_forwarded";
       font-family: "Material Symbols Outlined";
-      font-size: 1.5rem;
-      margin-right: 0.75rem;
+      font-size: 1.125rem;
+      margin-right: 0.5rem;
       font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    }
+    /* Call SID column truncation */
+    #history-table {
+      table-layout: fixed;
+    }
+    #history-table th:nth-child(1),
+    #history-table td:nth-child(1) {
+      width: 120px;
+    }
+    #history-table th:nth-child(2),
+    #history-table td:nth-child(2) {
+      width: 120px;
+    }
+    .call-sid-cell {
+      position: relative;
+    }
+    .call-sid-text {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .call-sid-tooltip {
+      position: absolute;
+      left: 0;
+      bottom: calc(70% + 4px);
+      z-index: 100;
+      display: none;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-family: ui-monospace, monospace;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .call-sid-tooltip::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 12px;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #1e293b;
+    }
+    .call-sid-cell:hover .call-sid-tooltip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-btn {
+      background: var(--forest-green);
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover {
+      background: rgb(22, 163, 74);
+    }
+    .copy-btn .material-symbols-outlined {
+      font-size: 14px;
+    }
+    .copy-btn.copied {
+      background: #3b82f6;
     }
   </style>
 </head>
-<body class="min-h-screen p-6 md:p-12 flex items-center justify-center">
-  <div class="max-w-6xl w-full space-y-12">
+<body class="min-h-screen p-4 md:p-8 flex items-center justify-center">
+  <div class="max-w-5xl w-full space-y-8">
     <!-- Header -->
-    <header class="text-center space-y-3">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 tracking-tight">
+    <header class="text-center space-y-2">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight">
         Twilio Call Dashboard
       </h1>
-      <p class="subtitle text-forest-green font-semibold text-sm uppercase tracking-[0.2em]">Automation Testing Interface</p>
+      <p class="subtitle text-forest-green font-semibold text-xs uppercase tracking-[0.2em]">Automation Testing Interface</p>
     </header>
 
-    <div class="grid grid-cols-1 gap-12">
+    <div class="grid grid-cols-1 gap-8">
       <!-- Make Call Section -->
-      <section class="neumorphic-flat p-8 md:p-12 rounded-xlarge">
-        <div class="flex items-center gap-4 mb-10">
-          <div class="neumorphic-button-soft w-14 h-14 flex items-center justify-center rounded-2xl text-forest-green">
-            <span class="material-symbols-outlined text-3xl">add_call</span>
+      <section class="neumorphic-flat p-6 md:p-8 rounded-xlarge">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="neumorphic-button-soft w-10 h-10 flex items-center justify-center rounded-xl text-forest-green">
+            <span class="material-symbols-outlined text-xl">add_call</span>
           </div>
-          <h2 class="text-2xl font-bold text-slate-700">Make a Call</h2>
+          <h2 class="text-lg font-bold text-slate-700">Make a Call</h2>
         </div>
-        <div class="flex flex-col lg:flex-row gap-8 items-end">
+        <div class="flex flex-col lg:flex-row gap-4 items-end">
           <div class="flex-grow w-full">
-            <label for="phone-input" class="block text-slate-500 font-bold mb-4 ml-2 text-sm uppercase tracking-wider">Phone Number</label>
+            <label for="phone-input" class="block text-slate-500 font-bold mb-2 ml-1 text-xs uppercase tracking-wider">Phone Number</label>
             <input
               type="tel"
               id="phone-input"
-              class="w-full neumorphic-inset border-none rounded-2xl py-5 px-8 text-slate-700 font-semibold placeholder-slate-400 focus:ring-2 focus:ring-forest-green/20 transition-all text-lg"
+              class="w-full neumorphic-inset border-none rounded-xl py-3 px-5 text-slate-700 font-semibold placeholder-slate-400 focus:ring-2 focus:ring-forest-green/20 transition-all text-sm"
               placeholder="+15005550006"
               pattern="\+[0-9]{10,15}"
               required
             >
           </div>
-          <button id="make-call-btn" class="w-full lg:w-80 neumorphic-button-forest text-white hover:brightness-110 font-bold py-5 px-12 rounded-2xl flex items-center justify-center transition-all active:scale-[0.98] text-lg whitespace-nowrap">Make Call</button>
+          <button id="make-call-btn" class="w-full lg:w-auto neumorphic-button-forest text-white hover:brightness-110 font-bold py-3 px-8 rounded-xl flex items-center justify-center transition-all active:scale-[0.98] text-sm whitespace-nowrap">Make Call</button>
         </div>
       </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Status Section -->
-        <section class="neumorphic-flat p-8 rounded-xlarge lg:col-span-1">
-          <div class="flex items-center gap-4 mb-8">
-            <div class="neumorphic-button-soft w-12 h-12 flex items-center justify-center rounded-2xl text-forest-green">
-              <span class="material-symbols-outlined text-2xl">sensors</span>
+        <section class="neumorphic-flat p-6 rounded-xlarge lg:col-span-1">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="neumorphic-button-soft w-9 h-9 flex items-center justify-center rounded-xl text-forest-green">
+              <span class="material-symbols-outlined text-lg">sensors</span>
             </div>
-            <h2 class="text-xl font-bold text-slate-700">Current Status</h2>
+            <h2 class="text-base font-bold text-slate-700">Current Status</h2>
           </div>
-          <div id="status-display" class="neumorphic-inset p-6 rounded-3xl space-y-4">
-            <div class="status-indicator idle flex items-center gap-3">
-              <span class="status-dot flex h-3 w-3 relative">
+          <div id="status-display" class="neumorphic-inset p-4 rounded-2xl space-y-3">
+            <div class="status-indicator idle flex items-center gap-2">
+              <span class="status-dot flex h-2.5 w-2.5 relative">
                 <span class="status-dot-ping animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
-                <span class="status-dot-inner relative inline-flex rounded-full h-3 w-3"></span>
+                <span class="status-dot-inner relative inline-flex rounded-full h-2.5 w-2.5"></span>
               </span>
-              <span class="status-text font-bold text-slate-600 text-lg">Idle</span>
+              <span class="status-text font-bold text-slate-600 text-base">Idle</span>
             </div>
-            <p id="status-message" class="text-slate-500 text-sm font-medium leading-relaxed">
+            <p id="status-message" class="text-slate-500 text-xs font-medium leading-relaxed">
               Ready to make a call
             </p>
-            <p id="call-sid" class="call-sid text-slate-400 text-xs font-mono"></p>
+            <p id="call-sid" class="call-sid text-slate-400 text-[10px] font-mono"></p>
           </div>
         </section>
 
         <!-- Call History Section -->
-        <section class="neumorphic-flat p-8 rounded-xlarge lg:col-span-2">
-          <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center gap-4">
-              <div class="neumorphic-button-soft w-12 h-12 flex items-center justify-center rounded-2xl text-forest-green">
-                <span class="material-symbols-outlined text-2xl">history</span>
+        <section class="neumorphic-flat p-6 rounded-xlarge lg:col-span-2">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+              <div class="neumorphic-button-soft w-9 h-9 flex items-center justify-center rounded-xl text-forest-green">
+                <span class="material-symbols-outlined text-lg">history</span>
               </div>
-              <h2 class="text-xl font-bold text-slate-700">Call History</h2>
+              <h2 class="text-base font-bold text-slate-700">Call History</h2>
             </div>
-            <button id="refresh-btn" class="neumorphic-button-soft text-slate-500 p-3 rounded-xl transition-all hover:text-forest-green">
-              <span class="material-symbols-outlined">refresh</span>
+            <button id="refresh-btn" class="neumorphic-button-soft text-slate-500 p-2 rounded-lg transition-all hover:text-forest-green">
+              <span class="material-symbols-outlined text-lg">refresh</span>
             </button>
           </div>
-          <div class="neumorphic-inset rounded-3xl overflow-hidden">
+          <div class="neumorphic-inset rounded-2xl overflow-hidden">
             <div class="overflow-x-auto">
               <table id="history-table" class="w-full text-left border-collapse">
                 <thead>
                   <tr class="text-slate-400 border-b border-black/5">
-                    <th class="p-5 font-bold text-xs uppercase tracking-widest">Call SID</th>
-                    <th class="p-5 font-bold text-xs uppercase tracking-widest">To</th>
-                    <th class="p-5 font-bold text-xs uppercase tracking-widest">Status</th>
-                    <th class="p-5 font-bold text-xs uppercase tracking-widest">Duration</th>
-                    <th class="p-5 font-bold text-xs uppercase tracking-widest text-right">Time</th>
+                    <th class="p-3 font-bold text-[10px] uppercase tracking-widest">Call SID</th>
+                    <th class="p-3 font-bold text-[10px] uppercase tracking-widest">To</th>
+                    <th class="p-3 font-bold text-[10px] uppercase tracking-widest">Status</th>
+                    <th class="p-3 font-bold text-[10px] uppercase tracking-widest">Duration</th>
+                    <th class="p-3 font-bold text-[10px] uppercase tracking-widest text-right">Time</th>
                   </tr>
                 </thead>
                 <tbody id="history-body">
                   <tr class="empty-state">
-                    <td class="py-16 text-center" colspan="5">
-                      <div class="flex flex-col items-center gap-3 text-slate-400">
-                        <span class="material-symbols-outlined text-5xl opacity-20">phone_disabled</span>
-                        <span class="font-semibold text-sm">No calls yet</span>
+                    <td class="py-10 text-center" colspan="5">
+                      <div class="flex flex-col items-center gap-2 text-slate-400">
+                        <span class="material-symbols-outlined text-4xl opacity-20">phone_disabled</span>
+                        <span class="font-semibold text-xs">No calls yet</span>
                       </div>
                     </td>
                   </tr>
@@ -213,16 +289,16 @@
     </div>
 
     <!-- Footer -->
-    <footer class="flex flex-col items-center justify-center mt-12 space-y-6">
-      <div class="flex gap-4">
-        <button class="neumorphic-button-soft w-12 h-12 rounded-full flex items-center justify-center text-slate-500 hover:text-forest-green transition-colors">
-          <span class="material-symbols-outlined">settings</span>
+    <footer class="flex flex-col items-center justify-center mt-8 space-y-4">
+      <div class="flex gap-3">
+        <button class="neumorphic-button-soft w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-forest-green transition-colors">
+          <span class="material-symbols-outlined text-lg">settings</span>
         </button>
-        <button class="neumorphic-button-soft w-12 h-12 rounded-full flex items-center justify-center text-slate-500 hover:text-forest-green transition-colors">
-          <span class="material-symbols-outlined">help_outline</span>
+        <button class="neumorphic-button-soft w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-forest-green transition-colors">
+          <span class="material-symbols-outlined text-lg">help_outline</span>
         </button>
       </div>
-      <p class="text-slate-400 text-xs font-medium tracking-wide uppercase">Twilio Telephony Automation Testing Framework</p>
+      <p class="text-slate-400 text-[10px] font-medium tracking-wide uppercase">Twilio Telephony Automation Testing Framework</p>
     </footer>
   </div>
 

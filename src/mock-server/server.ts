@@ -1,23 +1,51 @@
 import express, { Request, Response } from "express";
 import * as dotenv from "dotenv";
 import { TwilioClient } from "../api/twilio-client";
+import { MockTwilioClient } from "../api/mock-twilio-client";
 
 dotenv.config();
+
+type TwilioClientType = TwilioClient | MockTwilioClient;
 
 export class WebhookServer {
   private app: express.Application;
   private port: number;
   private webhooks: any[];
-  private twilioClient: TwilioClient;
+  private twilioClient: TwilioClientType;
   private server: any;
+  private useMock: boolean;
 
-  public constructor(port?: number) {
+  public constructor(port?: number, useMock?: boolean) {
     this.app = express();
     this.port = port || parseInt(process.env.MOCK_SERVER_PORT || "3000");
     this.webhooks = [];
-    this.twilioClient = new TwilioClient();
+
+    // Use mock client if explicitly requested or if real credentials are not available
+    this.useMock = useMock ?? this.shouldUseMock();
+
+    if (this.useMock) {
+      console.log("Using MockTwilioClient (no real Twilio credentials)");
+      this.twilioClient = new MockTwilioClient();
+    } else {
+      console.log("Using real TwilioClient");
+      this.twilioClient = new TwilioClient();
+    }
+
     this.setupMiddleware();
     this.setupRoutes();
+  }
+
+  private shouldUseMock(): boolean {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+    // Use mock if any credential is missing or if USE_MOCK is set
+    if (process.env.USE_MOCK === "true") {
+      return true;
+    }
+
+    return !accountSid || !authToken || !phoneNumber || !accountSid.startsWith("AC");
   }
 
   private setupMiddleware(): void {
