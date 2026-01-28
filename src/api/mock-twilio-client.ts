@@ -18,7 +18,7 @@ export class MockTwilioClient {
   private phoneNumber: string;
   private calls: Map<string, MockCall>;
 
-  public constructor(accountSid?: string, authToken?: string, phoneNumber?: string) {
+  public constructor(accountSid?: string, _authToken?: string, phoneNumber?: string) {
     this.accountSid = accountSid || process.env.TWILIO_ACCOUNT_SID || "ACmock12345678901234567890123456";
     this.phoneNumber = phoneNumber || process.env.TWILIO_PHONE_NUMBER || "+15551234567";
     this.calls = new Map();
