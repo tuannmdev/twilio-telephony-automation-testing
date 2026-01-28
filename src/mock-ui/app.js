@@ -182,11 +182,20 @@ class CallDashboard {
       .slice(0, 10)
       .map(call => `
         <tr>
-          <td><code>${call.sid}</code></td>
-          <td>${call.to}</td>
-          <td><span class="status-badge ${call.status}">${this.capitalizeStatus(call.status)}</span></td>
-          <td>${call.duration}s</td>
-          <td>${call.time}</td>
+          <td class="call-sid-cell p-3">
+            <span class="call-sid-text">${call.sid}</span>
+            <div class="call-sid-tooltip">
+              <span>${call.sid}</span>
+              <button class="copy-btn" data-sid="${call.sid}" onclick="window.copyCallSid(this, '${call.sid}')">
+                <span class="material-symbols-outlined">content_copy</span>
+                Copy
+              </button>
+            </div>
+          </td>
+          <td class="p-3 text-slate-600 text-xs">${call.to}</td>
+          <td class="p-3"><span class="status-badge ${call.status}">${this.capitalizeStatus(call.status)}</span></td>
+          <td class="p-3 text-slate-600 text-xs">${call.duration}s</td>
+          <td class="p-3 text-slate-600 text-xs text-right">${call.time}</td>
         </tr>
       `)
       .join("");
@@ -213,6 +222,22 @@ class CallDashboard {
     }
   }
 }
+
+// Global function to copy Call SID to clipboard
+window.copyCallSid = async function(button, sid) {
+  try {
+    await navigator.clipboard.writeText(sid);
+    const originalText = button.innerHTML;
+    button.innerHTML = '<span class="material-symbols-outlined">check</span>Copied!';
+    button.classList.add("copied");
+    setTimeout(() => {
+      button.innerHTML = originalText;
+      button.classList.remove("copied");
+    }, 1500);
+  } catch (error) {
+    console.error("Failed to copy:", error);
+  }
+};
 
 // Initialize dashboard when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
