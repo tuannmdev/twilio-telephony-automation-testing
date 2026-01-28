@@ -26,14 +26,11 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: code/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./code
         run: npm ci
 
       - name: Create .env file
-        working-directory: ./code
         run: |
           echo "TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}" >> .env
           echo "TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}" >> .env
@@ -41,7 +38,6 @@ jobs:
           echo "TEST_PHONE_TO=${{ secrets.TEST_PHONE_TO }}" >> .env
 
       - name: Run API tests
-        working-directory: ./code
         run: npm run test:api
 
       - name: Upload API test results
@@ -49,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-test-results
-          path: code/test-results/
+          path: test-results/
           retention-days: 30
 
       - name: Upload Playwright report
@@ -57,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-playwright-report
-          path: code/playwright-report/
+          path: playwright-report/
           retention-days: 30
 
   ui-tests:
@@ -74,18 +70,14 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: code/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./code
         run: npm ci
 
       - name: Install Playwright browsers
-        working-directory: ./code
         run: npx playwright install --with-deps chromium
 
       - name: Create .env file
-        working-directory: ./code
         run: |
           echo "TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }}" >> .env
           echo "TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }}" >> .env
@@ -94,7 +86,6 @@ jobs:
           echo "MOCK_SERVER_PORT=3000" >> .env
 
       - name: Start mock server
-        working-directory: ./code
         run: |
           npm run mock-server &
           echo $! > server.pid
@@ -105,12 +96,10 @@ jobs:
           timeout 30 bash -c 'until curl -f http://localhost:3000/health; do sleep 1; done'
 
       - name: Run UI tests
-        working-directory: ./code
         run: npm run test:ui
 
       - name: Stop mock server
         if: always()
-        working-directory: ./code
         run: |
           if [ -f server.pid ]; then
             kill $(cat server.pid) || true
@@ -121,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ui-test-results
-          path: code/test-results/
+          path: test-results/
           retention-days: 30
 
       - name: Upload Playwright report
@@ -129,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ui-playwright-report
-          path: code/playwright-report/
+          path: playwright-report/
           retention-days: 30
 
       - name: Upload test screenshots
@@ -137,7 +126,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ui-test-screenshots
-          path: code/test-results/**/screenshots/
+          path: test-results/**/screenshots/
           retention-days: 30
 
   lint-and-typecheck:
@@ -154,14 +143,11 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
-          cache-dependency-path: code/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./code
         run: npm ci
 
       - name: Run TypeScript type check
-        working-directory: ./code
         run: npx tsc --noEmit
 
   test-summary:
