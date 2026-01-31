@@ -54,6 +54,8 @@ test.describe("Outbound Call Tests", () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const callStatus = await twilioClient.getCallStatus(call.sid);
+    console.log('callStatus: ', callStatus);
+    console.log('call: ', call);
     expect(["busy", "failed", "queued", "ringing"]).toContain(callStatus.status);
   });
 
